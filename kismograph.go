@@ -184,7 +184,7 @@ func (w WirelessData) Dump(delm string, bssid map[string]bool, essid map[string]
 }
 
 func main() {
-	arguments, err := docopt.Parse(usage, nil, true, "kismograph 0.1", false)
+	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.0.0", false)
 	if err != nil {
 		log.Fatal("Error parsing usage. Error: ", err.Error())
 	}

@@ -4,7 +4,7 @@ kismograph
 Utility for converting Kismet XML files into CSV files for airograph.
 
 ##Download##
-Binary packages for every supported operating system are availble [here](https://github.com/mattburch/).
+Binary packages for every supported operating system are availble [here](https://github.com/mattburch/kismograph/releases/latest).
 
 ##Usage##
 ```
