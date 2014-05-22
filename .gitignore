@@ -1,0 +1,7 @@
+*.tar.gz
+*.sh
+*.sqp
+kismograph
+*.swp
+.DS_Store
+.idea/
