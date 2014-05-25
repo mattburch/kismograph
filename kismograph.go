@@ -129,6 +129,9 @@ func (c Client) Check(bssid string, b map[string]bool, p map[string]bool, neg bo
 	if c.MAC == "00:00:00:00:00:00" {
 		return nil
 	}
+	if c.MAC == bssid {
+		return nil
+	}
 
 	// If map[string] empty return nil
 	// If map[string] match and neg false return value
