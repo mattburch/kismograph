@@ -225,7 +225,7 @@ func main() {
 
 	b := ParseArg(arguments["--bssid"])
 	e := ParseArg(arguments["--essid"])
-	p := ParseArg(arguments["--probe"])
+	p := ParseArg(arguments["--probes"])
 
 	f := arguments["<file>"].(string)
 	data, err := kismoExtract(f)
