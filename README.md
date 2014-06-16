@@ -1,7 +1,7 @@
 kismograph
 ==============
 
-Utility for converting Kismet XML files into CSV files for airgraph.
+Utility for converting Kismet XML files into CSV files for airgraph-ng.
 
 ##Download##
 Binary packages for every supported operating system are availble [here](https://github.com/mattburch/kismograph/releases/latest).
