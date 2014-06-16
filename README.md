@@ -12,7 +12,7 @@ Usage:
   kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--negate] <file>
   kismograph [--ad-hoc] [--negate] <file>
   kismograph [--infra] [--negate] <file>
-  kismograph [--probing --probe=<probes>] [--negate] <file>
+  kismograph [--probing --probes=<probes>] [--negate] <file>
   kismograph -h | --help
   kismograph --version
 
