@@ -9,7 +9,10 @@ Binary packages for every supported operating system are availble [here](https:/
 ##Usage##
 ```
 Usage:
-  kismograph <file> [--bssid=<bssid> --essid=<essid> --probe=<probes>] [--negate]
+  kismograph [--bssid=<bssid> --essid=<essid> --probe=<probes>] [--negate] <file>
+  kismograph [--ad-hoc] [--negate] <file>
+  kismograph [--infra] [--negate] <file>
+  kismograph [--probing --probe=<probes>] [--negate] <file>
   kismograph -h | --help
   kismograph --version
 
@@ -20,7 +23,10 @@ Options:
                           BSSID values
   --essid <essid>         Line delimeted file or comma delimeted
                           ESSID values
-  --probe <probe>       Line delimeted file or comma delimeted
+  --probe <probe>         Line delimeted file or comma delimeted
                           values for client probe requests
   --negate                Negate provided bssid / essid values
+  --ad-hoc                Filter on Ad-Hoc networks and clients
+  --infra                 Filter on Infrastructure networks and clients
+  --probing               Filter on Probing clients
 ```
