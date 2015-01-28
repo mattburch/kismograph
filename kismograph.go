@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/docopt/docopt.go"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -12,6 +13,20 @@ type Dump struct {
 	ClientHeader []string
 	Networks     []string
 	Clients      []string
+}
+
+type Filter struct {
+	BSSID        map[string]bool
+	ESSID        map[string]bool
+	Probes       map[string]bool
+	NetSignal    int
+	ClientSignal int
+	Probing      bool
+	AdHoc        bool
+	Infra        bool
+	Nets         bool
+	Clients      bool
+	Negate       bool
 }
 
 // Fill header values for Wireless AP and Wireless client
@@ -67,7 +82,7 @@ func SplitEnc(s []SSID, delm string) []string {
 	return crypt
 }
 
-func (n Network) Dump(p PSSID, enc string) []string {
+func (n *Network) Dump(p PSSID, enc string) []string {
 	nets := []string{}
 
 	nets = append(nets, n.BSSID)
@@ -86,27 +101,23 @@ func (n Network) Dump(p PSSID, enc string) []string {
 	return nets
 }
 
-func (n *Network) Check(p PSSID, arg map[string]interface{}, enc string, bssid map[string]bool, essid map[string]bool) []string {
+func (n *Network) Check(p PSSID, filter Filter, enc string) []string {
 	if n.BSSID == "00:00:00:00:00:00" {
 		return nil
 	}
 	if n.Type == "probe" {
 		return nil
 	}
-	if arg["--probing"].(bool) && !arg["--negate"].(bool) {
+	if filter.Probing && !filter.Negate {
 		return nil
 	}
 
-	// If map[string] empty return nil
-	// If map[string] match and neg false return value
-	// If map[string] not match and neg true return value
-	// Default return nil
-	if len(bssid) == 0 && len(essid) == 0 {
+	if len(filter.BSSID) == 0 && len(filter.ESSID) == 0 {
 		return n.Dump(p, enc)
 	}
-	if (bssid[n.BSSID] || essid[p.ESSID]) && !arg["--negate"].(bool) {
+	if (filter.BSSID[n.BSSID] || filter.ESSID[p.ESSID]) && !filter.Negate {
 		return n.Dump(p, enc)
-	} else if !(bssid[n.BSSID] || essid[p.ESSID]) && arg["--negate"].(bool) {
+	} else if !(filter.BSSID[n.BSSID] || filter.ESSID[p.ESSID]) && filter.Negate {
 		return n.Dump(p, enc)
 	}
 
@@ -132,7 +143,7 @@ func (c *Client) Dump(bssid string) []string {
 	return assoc
 }
 
-func (c *Client) Check(bssid string, arg map[string]interface{}, b map[string]bool, p map[string]bool) []string {
+func (c *Client) Check(bssid string, filter Filter) []string {
 	if c.MAC == "00:00:00:00:00:00" {
 		return nil
 	}
@@ -145,87 +156,133 @@ func (c *Client) Check(bssid string, arg map[string]interface{}, b map[string]bo
 	// If map[string] not match and neg true return value
 	// Default return nil
 
-	if len(b) == 0 && len(p) == 0 {
+	if len(filter.BSSID) == 0 && len(filter.Probes) == 0 {
 		return c.Dump(bssid)
 	}
 	for _, probe := range c.Probes {
-		if p[probe] && !arg["--negate"].(bool) {
+		if filter.Probes[probe] && !filter.Negate {
 			return c.Dump(bssid)
-		} else if !p[probe] && arg["--negate"].(bool) {
+		} else if !filter.Probes[probe] && filter.Negate {
 			return c.Dump(bssid)
 		}
 		return nil
 	}
-	if b[bssid] && !arg["--negate"].(bool) {
+	if filter.BSSID[bssid] && !filter.Negate {
 		return c.Dump(bssid)
-	} else if !b[bssid] && arg["--negate"].(bool) {
+	} else if !filter.BSSID[bssid] && filter.Negate {
 		return c.Dump(bssid)
 	}
 	return nil
 }
 
-func (w *WirelessData) Dump(delm string, arg map[string]interface{}, bssid map[string]bool, essid map[string]bool, probe map[string]bool) {
+func (w *WirelessData) Dump(delm string, filter Filter) {
 	d := Dump{}
 	d.Header()
 
 	for _, net := range w.Networks {
-		if arg["--ad-hoc"].(bool) && !arg["--negate"].(bool) && net.Type != "ad-hoc" {
-			continue
-		} else if arg["--ad-hoc"].(bool) && arg["--negate"].(bool) && net.Type == "ad-hoc" {
-			continue
-		}
-		if arg["--infra"].(bool) && !arg["--negate"].(bool) && net.Type != "infrastructure" {
-			continue
-		} else if arg["--infra"].(bool) && arg["--negate"].(bool) && net.Type == "infrastructure" {
-			continue
-		}
 
-		pssid := net.ParseSSID(delm)
-		for _, enc := range pssid.Encrypt {
-			data := net.Check(pssid, arg, enc, bssid, essid)
-			if data != nil {
-				d.Networks = append(d.Networks, strings.Join(data, delm))
-			}
-		}
-
-		for _, c := range net.Clients {
-			if arg["--probing"].(bool) && !arg["--negate"].(bool) && len(c.Probes) == 0 {
+		if filter.Nets || (!filter.Nets && !filter.Clients) {
+			if filter.AdHoc && !filter.Negate && net.Type != "ad-hoc" {
 				continue
-			} else if arg["--probing"].(bool) && !arg["--negate"].(bool) && c.Type != "tods" {
-				continue
-			} else if arg["--probing"].(bool) && arg["--negate"].(bool) && c.Type == "tods" {
+			} else if filter.AdHoc && filter.Negate && net.Type == "ad-hoc" {
 				continue
 			}
-			if (arg["--ad-hoc"].(bool) || arg["--infra"].(bool)) && !arg["--negate"].(bool) && c.Type == "tods" {
+			if filter.Infra && !filter.Negate && net.Type != "infrastructure" {
+				continue
+			} else if filter.Infra && filter.Negate && net.Type == "infrastructure" {
+				continue
+			}
+			if filter.NetSignal != 0 && net.Power < filter.NetSignal {
 				continue
 			}
 
-			data := c.Check(net.BSSID, arg, bssid, probe)
-			if data != nil {
-				d.Clients = append(d.Clients, strings.Join(data, delm))
+			pssid := net.ParseSSID(delm)
+			for _, enc := range pssid.Encrypt {
+				data := net.Check(pssid, filter, enc)
+				if data != nil {
+					d.Networks = append(d.Networks, strings.Join(data, delm))
+				}
+			}
+		}
+
+		if filter.Clients || (!filter.Nets && !filter.Clients) {
+			for _, c := range net.Clients {
+				if filter.Probing && !filter.Negate && len(c.Probes) == 0 {
+					continue
+				} else if filter.Probing && !filter.Negate && c.Type != "tods" {
+					continue
+				} else if filter.Probing && filter.Negate && c.Type == "tods" {
+					continue
+				}
+				if (filter.AdHoc || filter.Infra) && !filter.Negate && c.Type == "tods" {
+					continue
+				}
+				if filter.ClientSignal != 0 && c.Power < filter.ClientSignal {
+					continue
+				}
+
+				data := c.Check(net.BSSID, filter)
+				if data != nil {
+					d.Clients = append(d.Clients, strings.Join(data, delm))
+				}
 			}
 		}
 	}
 
-	fmt.Println(strings.Join(d.NetHeader, delm))
+	if filter.Nets || (!filter.Nets && !filter.Clients) {
+		fmt.Println()
+		fmt.Println(strings.Join(d.NetHeader, delm))
+	}
 	for _, nets := range d.Networks {
 		fmt.Println(nets)
 	}
-	fmt.Printf("\n\n%v\n", strings.Join(d.ClientHeader, delm))
+	if filter.Clients || (!filter.Nets && !filter.Clients) {
+		fmt.Printf("\n\n%v\n", strings.Join(d.ClientHeader, delm))
+	}
 	for _, c := range d.Clients {
 		fmt.Println(c)
 	}
 }
 
 func main() {
-	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.1.0", false)
+	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.3", false)
 	if err != nil {
 		log.Fatal("Error parsing usage. Error: ", err.Error())
 	}
+	var filter Filter
+	filter.Nets = arguments["--nets"].(bool)
+	filter.Clients = arguments["--clients"].(bool)
+	filter.BSSID = ParseArg(arguments["--bssid"])
+	filter.ESSID = ParseArg(arguments["--essid"])
+	filter.Probes = ParseArg(arguments["--probes"])
+	filter.AdHoc = arguments["--ad-hoc"].(bool)
+	filter.Negate = arguments["--negate"].(bool)
+	filter.Infra = arguments["--infra"].(bool)
 
-	b := ParseArg(arguments["--bssid"])
-	e := ParseArg(arguments["--essid"])
-	p := ParseArg(arguments["--probes"])
+	if arguments["--netsignal"] != nil {
+		sig, err := strconv.Atoi(arguments["--netsignal"].(string))
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		if sig > 0 {
+			filter.NetSignal = sig - (sig * 2)
+		} else {
+			filter.NetSignal = sig
+		}
+	}
+	if arguments["--clientsignal"] != nil {
+		sig, err := strconv.Atoi(arguments["--clientsignal"].(string))
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		if sig > 0 {
+			filter.ClientSignal = sig - (sig * 2)
+		} else {
+			filter.ClientSignal = sig
+		}
+	}
 
 	f := arguments["<file>"].(string)
 	data, err := kismoExtract(f)
@@ -233,6 +290,6 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	data.Dump(", ", arguments, b, e, p)
+	data.Dump(", ", filter)
 
 }
