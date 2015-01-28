@@ -3,10 +3,10 @@ package main
 const usage = `
 
 Usage:
-  kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--nets --clients] [--netsignal=<sig>] [--clientsignal=<sig>] [--negate] <file>
-  kismograph [--ad-hoc] [--nets --clients] [--netsignal=<sig>] [--clientsignal=<sig>] [--negate] <file>
-  kismograph [--infra] [--nets --clients] [--netsignal=<sig>] [--clientsignal=<sig>] [--negate] <file>
-  kismograph [--probing --probes=<probes>] [--nets --clients] [--netsignal=<sig>] [--clientsignal=<sig>] [--negate] <file>
+  kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--nets | --clients] [--netsignal=<sig>] [--clientsignal=<sig> | --negate] <file>
+  kismograph [--ad-hoc] [--nets | --clients] [--netsignal=<sig> | --clientsignal=<sig>] [--negate] <file>
+  kismograph [--infra] [--nets | --clients] [--netsignal=<sig> | --clientsignal=<sig>] [--negate] <file>
+  kismograph [--probing --probes=<probes>] [--nets | --clients] [--netsignal=<sig> | --clientsignal=<sig>] [--negate] <file>
   kismograph -h | --help
   kismograph --version
 
