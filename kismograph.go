@@ -19,6 +19,7 @@ type Filter struct {
 	BSSID        map[string]bool
 	ESSID        map[string]bool
 	Probes       map[string]bool
+	Delm         string
 	NetSignal    int
 	ClientSignal int
 	Probing      bool
@@ -175,7 +176,7 @@ func (c *Client) Check(bssid string, filter Filter) []string {
 	return nil
 }
 
-func (w *WirelessData) Dump(delm string, filter Filter) {
+func (w *WirelessData) Dump(filter Filter) {
 	d := Dump{}
 	d.Header()
 
@@ -196,11 +197,11 @@ func (w *WirelessData) Dump(delm string, filter Filter) {
 				continue
 			}
 
-			pssid := net.ParseSSID(delm)
+			pssid := net.ParseSSID(filter.Delm)
 			for _, enc := range pssid.Encrypt {
 				data := net.Check(pssid, filter, enc)
 				if data != nil {
-					d.Networks = append(d.Networks, strings.Join(data, delm))
+					d.Networks = append(d.Networks, strings.Join(data, filter.Delm))
 				}
 			}
 		}
@@ -223,14 +224,14 @@ func (w *WirelessData) Dump(delm string, filter Filter) {
 
 				data := c.Check(net.BSSID, filter)
 				if data != nil {
-					d.Clients = append(d.Clients, strings.Join(data, delm))
+					d.Clients = append(d.Clients, strings.Join(data, filter.Delm))
 				}
 			}
 		}
 	}
 
 	if filter.Nets || (!filter.Nets && !filter.Clients) {
-		fmt.Println(strings.Join(d.NetHeader, delm))
+		fmt.Println(strings.Join(d.NetHeader, filter.Delm))
 		for _, nets := range d.Networks {
 			fmt.Println(nets)
 		}
@@ -238,7 +239,7 @@ func (w *WirelessData) Dump(delm string, filter Filter) {
 	}
 
 	if filter.Clients || (!filter.Nets && !filter.Clients) {
-		fmt.Println(strings.Join(d.ClientHeader, delm))
+		fmt.Println(strings.Join(d.ClientHeader, filter.Delm))
 		for _, c := range d.Clients {
 			fmt.Println(c)
 		}
@@ -248,7 +249,7 @@ func (w *WirelessData) Dump(delm string, filter Filter) {
 }
 
 func main() {
-	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.3", false)
+	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.4", false)
 	if err != nil {
 		log.Fatal("Error parsing usage. Error: ", err.Error())
 	}
@@ -261,6 +262,12 @@ func main() {
 	filter.AdHoc = arguments["--ad-hoc"].(bool)
 	filter.Negate = arguments["--negate"].(bool)
 	filter.Infra = arguments["--infra"].(bool)
+
+	if arguments["--delm"] != nil {
+		filter.Delm = arguments["--delm"].(string)
+	} else {
+		filter.Delm = ", "
+	}
 
 	if arguments["--netsignal"] != nil {
 		sig, err := strconv.Atoi(arguments["--netsignal"].(string))
@@ -293,6 +300,6 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	data.Dump(", ", filter)
+	data.Dump(filter)
 
 }

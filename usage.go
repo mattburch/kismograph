@@ -3,10 +3,10 @@ package main
 const usage = `
 
 Usage:
-  kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] <file>
-  kismograph [--ad-hoc] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] <file>
-  kismograph [--infra] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] <file>
-  kismograph [--probing --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] <file>
+  kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
+  kismograph [--ad-hoc] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
+  kismograph [--infra] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
+  kismograph [--probing --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
   kismograph -h | --help
   kismograph --version
 
@@ -27,4 +27,5 @@ Options:
   --netsignal <sig>       Set maximum signal strength for networks
   --clientsignal <sig>    Set maximum signal strength for clients
   --probing               Filter on Probing clients
+  --delm <delm>           Output delimiter (default: ", ")
 `
