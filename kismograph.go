@@ -230,18 +230,21 @@ func (w *WirelessData) Dump(delm string, filter Filter) {
 	}
 
 	if filter.Nets || (!filter.Nets && !filter.Clients) {
-		fmt.Println()
 		fmt.Println(strings.Join(d.NetHeader, delm))
+		for _, nets := range d.Networks {
+			fmt.Println(nets)
+		}
+		fmt.Println()
 	}
-	for _, nets := range d.Networks {
-		fmt.Println(nets)
-	}
+
 	if filter.Clients || (!filter.Nets && !filter.Clients) {
-		fmt.Printf("\n\n%v\n", strings.Join(d.ClientHeader, delm))
+		fmt.Println(strings.Join(d.ClientHeader, delm))
+		for _, c := range d.Clients {
+			fmt.Println(c)
+		}
+		fmt.Println()
 	}
-	for _, c := range d.Clients {
-		fmt.Println(c)
-	}
+
 }
 
 func main() {
