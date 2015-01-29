@@ -9,10 +9,10 @@ Binary packages for every supported operating system are availble [here](https:/
 ##Usage##
 ```
 Usage:
-  kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--negate] <file>
-  kismograph [--ad-hoc] [--negate] <file>
-  kismograph [--infra] [--negate] <file>
-  kismograph [--probing --probes=<probes>] [--negate] <file>
+  kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
+  kismograph [--ad-hoc] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
+  kismograph [--infra] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
+  kismograph [--probing --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
   kismograph -h | --help
   kismograph --version
 
@@ -26,7 +26,12 @@ Options:
   --probes <probe>        Line delimeted file or comma delimeted
                           values for client probe requests
   --negate                Negate provided bssid / essid values
+  --nets                  Filter output for networks only
+  --clients               Filter output for clients only
   --ad-hoc                Filter on Ad-Hoc networks and clients
   --infra                 Filter on Infrastructure networks and clients
+  --netsignal <sig>       Set maximum signal strength for networks
+  --clientsignal <sig>    Set maximum signal strength for clients
   --probing               Filter on Probing clients
+  --delm <delm>           Output delimiter (default: ", ")
 ```
