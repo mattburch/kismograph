@@ -1,8 +1,6 @@
 package main
 
 import (
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
 	"encoding/xml"
 	"io/ioutil"
 	"log"
@@ -10,6 +8,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/paulrosania/go-charset/charset"
+	_ "github.com/paulrosania/go-charset/data"
 )
 
 type WirelessData struct {
@@ -193,7 +194,6 @@ func kismoExtract(fileName string) (WirelessData, error) {
 		return k, err
 	}
 	defer r.Close()
-
 	// Convert Kismet XML Charset to UTF-8
 	d := xml.NewDecoder(r)
 	d.CharsetReader = charset.NewReader
