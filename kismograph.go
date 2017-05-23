@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/docopt/docopt.go"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/docopt/docopt.go"
 )
 
 type Dump struct {
@@ -249,7 +250,7 @@ func (w *WirelessData) Dump(filter Filter) {
 }
 
 func main() {
-	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.4", false)
+	arguments, err := docopt.Parse(usage, nil, true, "kismograph 1.5", false)
 	if err != nil {
 		log.Fatal("Error parsing usage. Error: ", err.Error())
 	}
