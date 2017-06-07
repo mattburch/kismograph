@@ -3,10 +3,10 @@ kismograph
 
 Utility for converting Kismet XML files into CSV files for airgraph-ng.
 
-##Download
+## Download
 Binary packages for every supported operating system are availble [here](https://github.com/mattburch/kismograph/releases/latest).
 
-##Usage
+## Usage
 ```
 Usage:
   kismograph [--bssid=<bssid> --essid=<essid> --probes=<probes>] [--nets [--netsignal=<sig>] | --clients [--clientsignal=<sig>]] [--negate] [--delm <delm>] <file>
