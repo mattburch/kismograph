@@ -19,7 +19,7 @@ Options:
                           ESSID values
   --probes <probe>        Line delimeted file or comma delimeted
                           values for client probe requests
-  --files <files>	  Comman delimeted file vaules
+  --files <files>         Comma delimeted file vaules
   --negate                Negate provided bssid / essid values
   --nets                  Filter output for networks only
   --clients               Filter output for clients only
