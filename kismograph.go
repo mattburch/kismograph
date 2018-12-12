@@ -177,9 +177,8 @@ func (c *Client) Check(bssid string, filter Filter) []string {
 	return nil
 }
 
-func (w *WirelessData) Dump(filter Filter) {
+func (w *WirelessData) Dump(filter Filter) Dump {
 	d := Dump{}
-	d.Header()
 
 	for _, net := range w.Networks {
 
@@ -231,22 +230,7 @@ func (w *WirelessData) Dump(filter Filter) {
 		}
 	}
 
-	if filter.Nets || (!filter.Nets && !filter.Clients) {
-		fmt.Println(strings.Join(d.NetHeader, filter.Delm))
-		for _, nets := range d.Networks {
-			fmt.Println(nets)
-		}
-		fmt.Println()
-	}
-
-	if filter.Clients || (!filter.Nets && !filter.Clients) {
-		fmt.Println(strings.Join(d.ClientHeader, filter.Delm))
-		for _, c := range d.Clients {
-			fmt.Println(c)
-		}
-		fmt.Println()
-	}
-
+	return d
 }
 
 func main() {
@@ -294,13 +278,40 @@ func main() {
 			filter.ClientSignal = sig
 		}
 	}
+	files := ParseArg(arguments["--files"])
+	if len(files) == 0 {
+		f := arguments["<file>"].(string)
+		files[f] = true
+	}
+	dump := []Dump{}
+	for f, _ := range files {
+		data, err := kismoExtract(f)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		dump = append(dump, data.Dump(filter))
+	}
+	dump[0].Header()
 
-	f := arguments["<file>"].(string)
-	data, err := kismoExtract(f)
-	if err != nil {
-		log.Fatal(err.Error())
+	if filter.Nets || (!filter.Nets && !filter.Clients) {
+		fmt.Println(strings.Join(dump[0].NetHeader, filter.Delm))
+		for _, d := range dump {
+			for _, nets := range d.Networks {
+				fmt.Println(nets)
+			}
+		}
+		fmt.Println()
 	}
 
-	data.Dump(filter)
+	if filter.Clients || (!filter.Nets && !filter.Clients) {
+		fmt.Println(strings.Join(dump[0].ClientHeader, filter.Delm))
+		for _, d := range dump {
+
+			for _, c := range d.Clients {
+				fmt.Println(c)
+			}
+		}
+		fmt.Println()
+	}
 
 }
